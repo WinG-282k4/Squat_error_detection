@@ -58,12 +58,13 @@ while cap.isOpened():
         # Hiển thị kết quả lên màn hình
         labels_dict = {
             0: "Correct",
-            1: "Chân quá hẹp",
-            2: "Chân quá rộng",
-            3: "Khoảng cách giữa 2 đầu gối quá nhỏ",
-            4: "Xuống quá sâu",
-            5: "Lỗi gập gập lưng"
+            1: "Chan qua hep",
+            2: "Chan qua rong",
+            3: "Goi qua hep ",
+            4: "Xuong qua sau",
+            5: "Lung gap"
         }
+        
         label_text = labels_dict.get(label, "Unknown")
         
         cv2.putText(frame, f"Prediction: {label_text}", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)

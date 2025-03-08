@@ -19,8 +19,15 @@ with open("Model/scaler_LR.pkl", "rb") as f:
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose()
 
-# Khởi tạo OpenCV
+# Khởi tạo cửa sổ OpenCV với kích thước Full HD
+cv2.namedWindow("Squat Detection", cv2.WINDOW_NORMAL)
+cv2.setWindowProperty("Squat Detection", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
 cap = cv2.VideoCapture(0)
+
+# Đặt độ phân giải của camera thành 1920x1080 (nếu camera hỗ trợ)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -38,7 +45,7 @@ while cap.isOpened():
         features = []
         for kp in IMPORTANT_KP:
             landmark = getattr(mp_pose.PoseLandmark, kp)
-            features.extend([landmarks[landmark].x, landmarks[landmark].y, landmarks[landmark].visibility])
+            features.extend([landmarks[landmark].x, landmarks[landmark].y, landmarks[landmark].z, landmarks[landmark].visibility])
         
         # Chuyển đổi thành numpy array và chuẩn hóa
         features = np.array(features).reshape(1, -1)
@@ -59,7 +66,7 @@ while cap.isOpened():
         }
         label_text = labels_dict.get(label, "Unknown")
         
-        cv2.putText(frame, f"Prediction: {label_text}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(frame, f"Prediction: {label_text}", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)
     
     cv2.imshow("Squat Detection", frame)
     
@@ -68,3 +75,4 @@ while cap.isOpened():
 
 cap.release()
 cv2.destroyAllWindows()
+

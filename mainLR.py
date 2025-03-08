@@ -52,8 +52,8 @@ while cap.isOpened():
         features = scaler.transform(features)
         
         # Dự đoán bằng model
-        prediction = model.predict(features)
-        label = np.argmax(prediction)  # Lấy nhãn có xác suất cao nhất
+        prediction_probs = model.predict_proba(features)  # Trả về mảng xác suất
+        label = np.argmax(prediction_probs)  # Lấy nhãn có xác suất cao nhất
         
         # Hiển thị kết quả lên màn hình
         labels_dict = {

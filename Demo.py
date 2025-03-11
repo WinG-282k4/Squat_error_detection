@@ -29,7 +29,7 @@ pose = mp_pose.Pose()
 # Đọc video đầu vào
 # video_path = "Data/Test/Chan_qua_hep/20250228_084059000_iOS.mp4"  
 # video_path = "Loi_gap_lung.mp4"
-video_path = "Video_demo.mp4"
+video_path = "Demo/Video_demo.mp4"
 cap = cv2.VideoCapture(video_path)
 
 # Lấy thông tin video
@@ -38,7 +38,7 @@ frame_height = int(cap.get(4))
 fps = int(cap.get(cv2.CAP_PROP_FPS))
 
 # Tạo VideoWriter để lưu video đầu ra
-output_path = "output_video.mp4"
+output_path = "Demo/output_video.mp4"
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Định dạng MP4
 out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
 

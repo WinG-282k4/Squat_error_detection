@@ -27,8 +27,9 @@ mp_pose = mp.solutions.pose
 pose = mp_pose.Pose()
 
 # Đọc video đầu vào
-video_path = "Data/Test/Chan_qua_hep/20250228_084059000_iOS.mp4"  # Thay bằng đường dẫn video của bạn
+# video_path = "Data/Test/Chan_qua_hep/20250228_084059000_iOS.mp4"  
 # video_path = "Loi_gap_lung.mp4"
+video_path = "Video_demo.mp4"
 cap = cv2.VideoCapture(video_path)
 
 # Lấy thông tin video

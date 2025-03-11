@@ -1,4 +1,3 @@
 venv/
 Data/
 *.mp4
-Extract_video_to_dataset.ipynb

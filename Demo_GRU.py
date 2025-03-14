@@ -51,7 +51,7 @@ mp_pose = mp.solutions.pose
 pose = mp_pose.Pose()
 
 # Đọc video đầu vào
-video_path = "Demo/Video_demo.mp4"
+video_path = "Demo/Video_demo1.mp4"
 cap = cv2.VideoCapture(video_path)
 
 # Lấy thông tin video
@@ -60,7 +60,7 @@ frame_height = int(cap.get(4))
 fps = int(cap.get(cv2.CAP_PROP_FPS))
 
 # Tạo VideoWriter để lưu video đầu ra
-output_path = "Demo/GRU_output_video.mp4"
+output_path = "Demo/GRU_output_video1.mp4"
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Định dạng MP4
 out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
 

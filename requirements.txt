@@ -5,3 +5,5 @@ pandas
 matplotlib
 seaborn
 tensorflow
+jupyter
+scikit-learn

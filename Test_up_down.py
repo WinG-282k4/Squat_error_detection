@@ -40,7 +40,7 @@ DOWN = 0
 
 #Khởi tạo biến
 count = 0
-pre_state = UP
+pre_state = -1
 
 # Khởi tạo MediaPipe Pose
 mp_pose = mp.solutions.pose
@@ -103,13 +103,15 @@ while cap.isOpened():
         now_time = datetime.now()
         if (now_time - pre_time).total_seconds() > 0.1:
             if label_text == "Down":
-                if pre_state == UP:
+                if pre_state == UP and pre_state != -1:
                     count += 1
         
             pre_state = DOWN if label_text == "Down" else UP
             pre_time = now_time
         # Hiển thị nhãn lên video
         cv2.putText(frame, f"Prediction: {label_text}", (50, 100), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)
+        cv2.putText(frame, f"count: {count}", (50, 150), 
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)
         
         # In xác suất của từng lớp

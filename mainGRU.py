@@ -25,8 +25,8 @@ class Attention(Layer):
         return K.sum(output, axis=1)
 
 # Load model Keras và scaler
-scaler_path = "Model/scaler_GRU.pkl"
-model_path = "Model/Squat_detection_GRU.keras"
+scaler_path = "Model/scaler_GRU_LOSO.pkl"
+model_path = "Model/Squat_detection_GRU_LOSO.keras"
 
 with open(scaler_path, "rb") as f:
     scaler = pickle.load(f)

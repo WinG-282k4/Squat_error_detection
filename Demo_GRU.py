@@ -51,7 +51,7 @@ mp_pose = mp.solutions.pose
 pose = mp_pose.Pose()
 
 # Đọc video đầu vào
-video_path = "Demo/data_test.mp4"
+video_path = "Demo/Demo_lech.mp4"
 cap = cv2.VideoCapture(video_path)
 
 # Lấy thông tin video
@@ -60,40 +60,45 @@ frame_height = int(cap.get(4))
 fps = int(cap.get(cv2.CAP_PROP_FPS))
 
 # Tạo VideoWriter để lưu video đầu ra
-output_path = "Demo/GRU_videotest.mp4"
+output_path = "Demo/GRU_videotest_lech.mp4"
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Định dạng MP4
 out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
+
+# Biến theo dõi nhãn dự đoán liên tiếp
+prev_label = None
+label_count = 0
+stable_label = None
+stable_threshold = 3  # số frame liên tiếp
 
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
-        break  # Thoát nếu hết video
+        break
     
-    # Chuyển đổi sang RGB để xử lý với MediaPipe
     img_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = pose.process(img_rgb)
     
     if results.pose_landmarks:
         landmarks = results.pose_landmarks.landmark
-        
-        # Lấy tọa độ x, y, z và độ tin cậy của keypoints quan trọng
+        nose = landmarks[mp_pose.PoseLandmark.NOSE]
+        delta_x = nose.x - 0.5
+
         features = []
         for kp in IMPORTANT_KP:
-            landmark = getattr(mp_pose.PoseLandmark, kp)
-            features.extend([landmarks[landmark].x, landmarks[landmark].y, landmarks[landmark].z, landmarks[landmark].visibility])
-        
-        # Chuyển đổi thành numpy array và chuẩn hóa
+            landmark = landmarks[getattr(mp_pose.PoseLandmark, kp)]
+            x = landmark.x - delta_x
+            y = landmark.y
+            z = landmark.z
+            visibility = landmark.visibility
+            features.extend([x, y, z, visibility])
+
         features = np.array(features).reshape(1, -1)
         features = scaler.transform(features)
-        
-        # Thêm một chiều để phù hợp với định dạng đầu vào của mô hình
         features = np.expand_dims(features, axis=1)
-        
-        # Dự đoán bằng model Keras
-        probabilities = model.predict(features)  # Lấy xác suất của từng lớp
-        label = np.argmax(probabilities)  # Lấy nhãn có xác suất cao nhất
-        
-        # Nhãn lỗi Squat
+
+        probabilities = model.predict(features)
+        label = np.argmax(probabilities)
+
         labels_dict = {
             0: "Correct",
             1: "Chan qua hep",
@@ -102,19 +107,28 @@ while cap.isOpened():
             4: "Xuong qua sau",
             5: "Lung gap"
         }
-        label_text = labels_dict.get(label, "Unknown")
-        
-        # Hiển thị nhãn lên video
-        cv2.putText(frame, f"Prediction: {label_text}", (50, 100), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)
-        
-        # In xác suất của từng lớp
-        print(f"Frame: {label_text}, Xác suất: {probabilities}")
+
+        # Kiểm tra xem nhãn hiện tại có giống nhãn trước đó không
+        if label == prev_label:
+            label_count += 1
+        else:
+            label_count = 1  # reset count
+            prev_label = label
+
+        # Chỉ cập nhật stable_label nếu nhãn lặp >= ngưỡng
+        if label_count >= stable_threshold:
+            stable_label = label
+        else:
+            stable_label = None  # chưa đủ ổn định
+
+        # Nếu có nhãn ổn định, hiển thị lên video
+        if stable_label is not None:
+            label_text = labels_dict.get(stable_label, "Unknown")
+            cv2.putText(frame, f"Prediction: {label_text}", (50, 100),
+                        cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)
+            print(f"Frame: {label_text}, Xác suất: {probabilities}")
     
-    # Ghi frame có nhãn vào video output
     out.write(frame)
-    
-    # Hiển thị video trong quá trình xử lý
     cv2.imshow("Squat Detection", frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
